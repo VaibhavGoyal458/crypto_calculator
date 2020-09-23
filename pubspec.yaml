@@ -1,0 +1,32 @@
+name: crypto_calc
+description: A new Flutter application.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^0.1.2
+  http: ^0.12.2
+  crypto_font_icons: ^0.1.0+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+
+  uses-material-design: true
+  fonts:
+    - family: Oswald
+      fonts:
+        - asset: assets/Oswald/Oswald-Regular.ttf
+        - asset: assets/Oswald/Oswald-ExtraLight.ttf
+          weight: 200
+        - asset: assets/Oswald/Oswald-Light.ttf
+          weight: 300
+        - asset: assets/Oswald/Oswald-Medium.ttf
+          weight: 500
