@@ -8,11 +8,6 @@ crypto-currencies in different currencies.
 * [Demo](#demo)
 * [Setup](#setup)
 
-## General Info
-
-This app is created in order to understand the learn and understand the usage of external API's in
-a Flutter App. Free OpenWeatherMap APIs has been used in order to fetch the weather data.
-
 ## Dependencies
 
 * [http Dart Package](https://pub.dev/packages/http)
