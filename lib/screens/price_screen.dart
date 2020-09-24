@@ -23,6 +23,7 @@ class _PriceScreenState extends State<PriceScreen> {
   var cryptoResponse;
   var cryptValue;
 
+  // TODO: Complete the cupertino dropdown functionality
   CupertinoPicker cupertinoDropdown() {
     List<Text> dropDown = [];
     for (String currency in currenciesList) {
@@ -42,29 +43,44 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  DropdownButton<String> materialDropdown() {
-    List<DropdownMenuItem<String>> dropdownList = [];
+  ListView currencyHorizontalList() {
+    List<Widget> paddingWidgetList = [];
     for (String currency in currenciesList) {
-      DropdownMenuItem<String> dropdownMenuItem = DropdownMenuItem<String>(
-        child: Text(currency),
-        value: currency,
+      Padding paddingWidget = Padding(
+        padding: EdgeInsets.all(10),
+        child: FlatButton(
+          color: Color(0xFF2C2C53),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              '$currency',
+              style: kBottomContainerTextStyle,
+            ),
+          ),
+          onPressed: () {
+            setState(() {
+              selectedCurrency = currency;
+              isWaiting = true;
+            });
+            getCryptoData();
+          },
+        ),
       );
-      dropdownList.add(dropdownMenuItem);
+      paddingWidgetList.add(paddingWidget);
     }
 
-    return DropdownButton<String>(
-      value: selectedCurrency,
-      underline: SizedBox(),
-      items: dropdownList,
-      style: kBottomContainerTextStyle,
-      onChanged: (value) {
-        setState(() {
-          selectedCurrency = value;
-          isWaiting = true;
-        });
-        getCryptoData();
-      },
+    ListView horizontalList = ListView(
+      scrollDirection: Axis.horizontal,
+      children: <Widget>[
+        Container(
+          height: 100,
+          child: Row(
+            children: paddingWidgetList,
+          ),
+        )
+      ],
     );
+    return horizontalList;
   }
 
   void getCryptoData() async {
@@ -184,24 +200,14 @@ class _PriceScreenState extends State<PriceScreen> {
             ),
           ),
           Container(
-            height: 100.0,
-            alignment: Alignment.center,
-            color: Color(0xFF212244),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'Currency :  ',
-                  style: kBottomContainerTextStyle.copyWith(
-                      fontWeight: FontWeight.w400),
-                ),
-                Container(
-                  child:
-                      Platform.isIOS ? cupertinoDropdown() : materialDropdown(),
-                )
-              ],
-            ),
-          )
+              height: 100.0,
+              alignment: Alignment.center,
+              color: Color(0xFF212244),
+              child: Container(
+                child: Platform.isIOS
+                    ? cupertinoDropdown()
+                    : currencyHorizontalList(),
+              ))
         ],
       ),
     );
