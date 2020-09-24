@@ -1,5 +1,7 @@
+import 'package:crypto_calc/screens/loading.dart';
 import 'package:crypto_calc/services/networking.dart';
-import 'package:crypto_font_icons/crypto_font_icons.dart';
+import 'package:crypto_calc/utils/coin_data.dart';
+import 'package:crypto_calc/utils/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -7,10 +9,9 @@ import 'package:flutter/material.dart';
 //similar to 'show', we have 'hide' which only hides the specified class and imports all the rest of the class form the package
 import 'dart:io' show Platform;
 
-import 'coin_data.dart';
-import 'constants.dart';
-
 class PriceScreen extends StatefulWidget {
+  final dynamic response;
+  PriceScreen({this.response});
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
@@ -18,34 +19,9 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   NetworkHelper networkHelper = NetworkHelper();
   String selectedCurrency = 'USD';
-  var cryptValue;
   bool isWaiting = false;
-
-  DropdownButton<String> materialDropdown() {
-    List<DropdownMenuItem<String>> dropdownList = [];
-    for (String currency in currenciesList) {
-      DropdownMenuItem<String> dropdownMenuItem = DropdownMenuItem<String>(
-        child: Text(currency),
-        value: currency,
-      );
-      dropdownList.add(dropdownMenuItem);
-    }
-
-    return DropdownButton<String>(
-      value: selectedCurrency,
-      underline: SizedBox(),
-      items: dropdownList,
-      style: kBottomContainerTextStyle,
-      onChanged: (value) {
-        setState(() {
-          selectedCurrency = value;
-          isWaiting = true;
-          cryptValue = '';
-        });
-        getCryptoData();
-      },
-    );
-  }
+  var cryptoResponse;
+  var cryptValue;
 
   CupertinoPicker cupertinoDropdown() {
     List<Text> dropDown = [];
@@ -66,19 +42,61 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  void getCryptoData() async {
-    cryptValue = {};
-    var response = await networkHelper.getData(selectedCurrency);
-    isWaiting = false;
-    setState(() {
-      for (dynamic crypt in cryptoList) {
-        var key = crypt['crypto'];
-        cryptValue[key] = response[key]['response']['rate'].toStringAsFixed(2);
-      }
-    });
+  DropdownButton<String> materialDropdown() {
+    List<DropdownMenuItem<String>> dropdownList = [];
+    for (String currency in currenciesList) {
+      DropdownMenuItem<String> dropdownMenuItem = DropdownMenuItem<String>(
+        child: Text(currency),
+        value: currency,
+      );
+      dropdownList.add(dropdownMenuItem);
+    }
+
+    return DropdownButton<String>(
+      value: selectedCurrency,
+      underline: SizedBox(),
+      items: dropdownList,
+      style: kBottomContainerTextStyle,
+      onChanged: (value) {
+        setState(() {
+          selectedCurrency = value;
+          isWaiting = true;
+        });
+        getCryptoData();
+      },
+    );
   }
 
-  List<Widget> returnPaddingWidget() {
+  void getCryptoData() async {
+    cryptValue = {};
+    if (cryptoResponse != null) {
+      for (dynamic crypt in cryptoList) {
+        var key = crypt['crypto'];
+        cryptValue[key] =
+            cryptoResponse[key]['response']['rate'].toStringAsFixed(2);
+      }
+      cryptoResponse = null;
+    } else {
+      var response = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Loading(
+            currency: selectedCurrency,
+          ),
+        ),
+      );
+      setState(() {
+        isWaiting = false;
+        for (dynamic crypt in cryptoList) {
+          var key = crypt['crypto'];
+          cryptValue[key] =
+              response[key]['response']['rate'].toStringAsFixed(2);
+        }
+      });
+    }
+  }
+
+  List<Widget> cryptoWidget() {
     List<Widget> paddingWidgets = [];
     for (dynamic crypt in cryptoList) {
       var key = crypt['crypto'];
@@ -130,7 +148,7 @@ class _PriceScreenState extends State<PriceScreen> {
 
   @override
   void initState() {
-    isWaiting = true;
+    cryptoResponse = widget.response;
     getCryptoData();
     super.initState();
   }
@@ -159,7 +177,7 @@ class _PriceScreenState extends State<PriceScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: returnPaddingWidget(),
+                    children: cryptoWidget(),
                   ),
                 ),
               ],

@@ -1,5 +1,5 @@
+import 'package:crypto_calc/screens/loading.dart';
 import 'package:flutter/material.dart';
-import 'price_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
           primaryColor: Color(0xFF212244),
           scaffoldBackgroundColor: Color(0xFF161730)),
-      home: PriceScreen(),
+      home: Loading(),
     );
   }
 }
